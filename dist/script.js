@@ -11,44 +11,44 @@ function handleKeyDown(event) {
     clearDisplay();
     const numberKeys = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
     for (let i = 0; i < numberKeys.length; i++) {
-        if (Number(currentOperand[0]) === 0 && Number(event.key) === 0) {
+        if (Number(currentOperand[0]) === 0 && Number(event.key) === 0) { // avoid multiple 0 input if the first digit input is 0
             currentOperand.shift();
         }
-        else if (Number(currentOperand[0]) === 0 && Number(event.key) !== 0) {
+        else if (Number(currentOperand[0]) === 0 && Number(event.key) !== 0) { // remove the 0 if the first digit input is 0
             currentOperand.shift();
         }
-        if (Number(event.key) === numberKeys[i]) {
+        if (Number(event.key) === numberKeys[i]) { // push in number input to currentOperand
             currentOperand.push(event.key);
         }
     }
     const symbolKeys = ['+', '-', '*', '/', '.', '='];
     for (let x = 0; x < symbolKeys.length; x++) {
-        if (currentOperand.length !== 0 && event.key === symbolKeys[x]) {
+        if (currentOperand.length !== 0 && event.key === symbolKeys[x]) { // avoid symbol input before a digit is enter 
             if (event.key === "*") {
-                currentOperand.push(symbolKeys[x].replace(symbolKeys[x], '×'));
+                currentOperand.push(symbolKeys[x].replace(symbolKeys[x], '×')); // convert the multiply symbol
             }
             else if (event.key === "/") {
-                currentOperand.push(symbolKeys[x].replace(symbolKeys[x], '÷'));
+                currentOperand.push(symbolKeys[x].replace(symbolKeys[x], '÷')); // convert the divide symbol
             }
             else {
-                currentOperand.push(symbolKeys[x]);
+                currentOperand.push(symbolKeys[x]); // push in symbol key to currentOperand
             }
             previousOperand.push(currentOperand.join("").toString());
             currentOperand = [];
         }
     }
-    if (event.key === "%") {
+    if (event.key === "%") { // convert % to muliply 0.01
         let toPercentage = (Number(currentOperand.join("")) * 0.01);
         currentOperand[0] = toPercentage.toString();
     }
-    if (event.keyCode === 8) { // BACKSPACE
+    if (event.keyCode === 8) { // backspace
         currentOperand.pop();
     }
-    else if (event.keyCode === 27) { // ESCAPE
+    else if (event.keyCode === 27) { // escape
         previousOperand = [];
         currentOperand = [];
     }
-    else if (event.keyCode === 13 && previousOperand.length !== 0) { // ENTER
+    else if (event.keyCode === 13 && previousOperand.length !== 0) { // enter
         let enter = event.key;
         enter = '=';
         performCalculation();
@@ -64,7 +64,14 @@ function handleBtnClick(event) {
     for (let i = 0; i < numberKeys.length; i++) {
         if (userInput === numberKeys[i]) {
             currentOperand.push(userInput);
-            console.log(currentOperand);
+        }
+    }
+    const symbolKeys = ['+', '-', '×', '÷', '.', '='];
+    for (let x = 0; x < symbolKeys.length; x++) {
+        if (currentOperand.length !== 0 && userInput === symbolKeys[x]) { // avoid symbol input before a digit is enter 
+            currentOperand.push(userInput);
+            previousOperand.push(currentOperand.join("").toString());
+            currentOperand = [];
         }
     }
     loadDisplay();
@@ -139,17 +146,17 @@ function loadCalculator(main) {
 function loadDisplay() {
     const screen = document.querySelector('.screen');
     const prevInput = document.createElement('p');
+    screen === null || screen === void 0 ? void 0 : screen.appendChild(prevInput);
     prevInput.className = 'prevInput';
     prevInput.innerText = previousOperand.toString();
-    screen === null || screen === void 0 ? void 0 : screen.appendChild(prevInput);
     if (prevInput.innerText.length > 20) {
         prevInput.innerText = prevInput.innerText.substring(prevInput.innerText.length, 20);
     }
     ;
     const currInput = document.createElement('p');
+    screen === null || screen === void 0 ? void 0 : screen.appendChild(currInput);
     currInput.className = 'currInput';
     currInput.innerText = currentOperand.join("").toString();
-    screen === null || screen === void 0 ? void 0 : screen.appendChild(currInput);
     if (currInput.innerText.length > 20) {
         currInput.innerText = currInput.innerText.substring(currInput.innerText.length, 20);
     }
