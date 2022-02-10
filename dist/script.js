@@ -5,71 +5,94 @@ window.onload = () => {
     loadMain();
     loadFooter();
 };
-let previousOperand = [];
-let currentOperand = ["0"];
+let prevOperand = [];
+let currOperand = ["0"];
+// push in number input to currentOperand
+function addNumToCurrOperand(digit) {
+    currOperand.push(digit);
+}
+function resetCurrOperand() {
+    currOperand = ["0"];
+}
+function resetPrevOperand() {
+    prevOperand = [];
+}
 function handleKeyDown(event) {
     clearDisplay();
-    const numberKeys = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
-    for (let i = 0; i < numberKeys.length; i++) {
-        if (Number(currentOperand[0]) === 0 && Number(event.key) === 0) {
-            // avoid multiple 0 input if the first digit input is 0
-            currentOperand.shift();
+    const digits = [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "0",
+        ".",
+    ];
+    for (let i = 0; i < digits.length; i++) {
+        if ((currOperand[0] === "0" && event.key === "0") || // avoid multiple 0 input if the first digit input is 0
+            (currOperand[0] === "0" && event.key !== digits[i]) // avoid 0 being erased when other key is pressed
+        ) {
+            resetCurrOperand();
         }
-        else if (Number(currentOperand[0]) === 0 && Number(event.key) !== 0) {
+        else if (currOperand[0] === "0" && event.key !== "0") {
             // remove the 0 if the first digit input is 0
-            currentOperand.shift();
+            currOperand.shift();
+            addNumToCurrOperand(event.key);
         }
-        if (Number(event.key) === numberKeys[i]) {
-            // push in number input to currentOperand
-            currentOperand.push(event.key);
+        else if (event.key === digits[i]) {
+            addNumToCurrOperand(event.key);
         }
     }
-    const symbolKeys = ["+", "-", "*", "/", ".", "="];
-    for (let x = 0; x < symbolKeys.length; x++) {
-        if (currentOperand.length !== 0 && event.key === symbolKeys[x]) {
+    const operators = ["+", "-", "*", "/"];
+    for (let x = 0; x < operators.length; x++) {
+        if (prevOperand.length !== 0 && event.key === operators[x]) {
+            performCalculation();
+        }
+        else if (currOperand.length !== 0 && event.key === operators[x]) {
             // avoid symbol input before a digit is enter
             if (event.key === "*") {
-                currentOperand.push(symbolKeys[x].replace(symbolKeys[x], "×")); // convert the multiply symbol
+                addNumToCurrOperand(operators[x].replace(operators[x], "×")); // convert the multiply symbol
             }
             else if (event.key === "/") {
-                currentOperand.push(symbolKeys[x].replace(symbolKeys[x], "÷")); // convert the divide symbol
+                addNumToCurrOperand(operators[x].replace(operators[x], "÷")); // convert the divide symbol
             }
             else {
-                currentOperand.push(symbolKeys[x]); // push in symbol key to currentOperand
+                addNumToCurrOperand(operators[x]); // push in symbol key to currentOperand
             }
-            previousOperand.push(currentOperand.join("").toString());
-            currentOperand = ["0"];
+            prevOperand.push(currOperand.join("").toString());
+            resetCurrOperand();
         }
     }
     if (event.key === "%") {
-        // convert % to muliply 0.01
-        let toPercentage = (Number(currentOperand.join("")) * 0.01)
-            .toFixed(2)
-            .toString();
-        currentOperand[0] = toPercentage;
+        let num = Number(currOperand.join(""));
+        currOperand = [];
+        currOperand[0] = performPercentageCalculation(num).toString();
     }
     if (event.keyCode === 8) {
         // backspace
-        currentOperand.pop();
+        removeLastDigitInput();
     }
     else if (event.keyCode === 27) {
         // escape
-        previousOperand = [];
-        currentOperand = ["0"];
+        resetCurrOperand;
+        resetPrevOperand;
     }
-    else if (event.keyCode === 13 && previousOperand.length !== 0) {
+    else if ((event.keyCode === 13 && prevOperand.length !== 0) ||
+        (event.key === "=" && prevOperand.length !== 0)) {
         // enter
-        let enter = event.key;
-        enter = "=";
+        event.key.replace(event.key, "=");
         performCalculation();
     }
     loadDisplay();
 }
-function handleBtnClick(event) {
-    clearDisplay();
-    const eventTarget = event.target;
-    eventTarget.blur(); // remove focus after click
-    const userInput = eventTarget.innerText;
+function removeLastDigitInput() {
+    currOperand.pop();
+}
+function checkIfInputIsNum(input) {
     const numberKeys = [
         "1",
         "2",
@@ -81,23 +104,34 @@ function handleBtnClick(event) {
         "8",
         "9",
         "0",
+        ".",
     ];
     for (let i = 0; i < numberKeys.length; i++) {
-        if (Number(currentOperand[0]) === 0 && userInput === numberKeys[i]) {
-            currentOperand.shift();
-            currentOperand.push(userInput);
+        if (input === numberKeys[i]) {
+            return true;
         }
-        else if (userInput === numberKeys[i]) {
-            currentOperand.push(userInput);
-        }
+        return false;
     }
-    const symbolKeys = ["+", "-", "×", "÷", ".", "="];
+}
+function handleBtnClick(event) {
+    clearDisplay();
+    const eventTarget = event.target;
+    eventTarget.blur(); // remove focus after click
+    const userInput = eventTarget.innerText;
+    if (Number(currOperand[0]) === 0 && checkIfInputIsNum(userInput)) {
+        currOperand.shift();
+        addNumToCurrOperand(userInput);
+    }
+    else if (checkIfInputIsNum(userInput)) {
+        addNumToCurrOperand(userInput);
+    }
+    const symbolKeys = ["+", "-", "×", "÷", "="];
     for (let x = 0; x < symbolKeys.length; x++) {
-        if (currentOperand.length !== 0 && userInput === symbolKeys[x]) {
+        if (currOperand.length !== 0 && userInput === symbolKeys[x]) {
             // avoid symbol input before a digit is enter
-            currentOperand.push(userInput);
-            previousOperand.push(currentOperand.join("").toString());
-            currentOperand = ["0"];
+            currOperand.push(userInput);
+            prevOperand.push(currOperand.join("").toString());
+            resetCurrOperand();
         }
     }
     loadDisplay();
@@ -175,16 +209,16 @@ function loadDisplay() {
     const prevInput = document.createElement("p");
     screen === null || screen === void 0 ? void 0 : screen.appendChild(prevInput);
     prevInput.className = "prevInput";
-    prevInput.innerText = previousOperand.toString();
-    if (prevInput.innerText.length > 20) {
-        prevInput.innerText = prevInput.innerText.substring(prevInput.innerText.length, 20);
+    prevInput.innerText = prevOperand.toString();
+    if (prevInput.innerText.length > 16) {
+        prevInput.innerText = prevInput.innerText.substring(0, 18);
     }
     const currInput = document.createElement("p");
     screen === null || screen === void 0 ? void 0 : screen.appendChild(currInput);
     currInput.className = "currInput";
-    currInput.innerText = currentOperand.join("").toString();
-    if (currInput.innerText.length > 20) {
-        currInput.innerText = currInput.innerText.substring(currInput.innerText.length, 20);
+    currInput.innerText = currOperand.join("").toString();
+    if (currInput.innerText.length > 16) {
+        currInput.innerText = currInput.innerText.substring(0, 16);
     }
 }
 function clearDisplay() {
@@ -193,20 +227,23 @@ function clearDisplay() {
     const prevInput = document.querySelector(".prevInput");
     prevInput === null || prevInput === void 0 ? void 0 : prevInput.remove();
 }
+function performPercentageCalculation(num) {
+    return (num / 100).toFixed(2);
+}
 function performCalculation() {
     let computation;
-    let prev = parseFloat(previousOperand.join(""));
-    let curr = parseFloat(currentOperand.join(""));
-    if (previousOperand[0].includes("+")) {
+    let prev = parseFloat(prevOperand.join(""));
+    let curr = parseFloat(currOperand.join(""));
+    if (prevOperand[0].includes("+")) {
         computation = prev + curr;
     }
-    else if (previousOperand[0].includes("-")) {
+    else if (prevOperand[0].includes("-")) {
         computation = prev - curr;
     }
-    else if (previousOperand[0].includes("×")) {
+    else if (prevOperand[0].includes("×")) {
         computation = prev * curr;
     }
-    else if (previousOperand[0].includes("÷")) {
+    else if (prevOperand[0].includes("÷")) {
         computation = prev / curr;
     }
     else {
@@ -215,8 +252,8 @@ function performCalculation() {
     printAnswer(computation);
 }
 function printAnswer(computation) {
-    currentOperand = [];
-    previousOperand = [];
-    currentOperand.push(computation.toString());
+    currOperand = [];
+    resetPrevOperand();
+    addNumToCurrOperand(computation.toString());
 }
 //# sourceMappingURL=script.js.map
