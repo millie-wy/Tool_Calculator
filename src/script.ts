@@ -309,7 +309,7 @@ function loadDisplay() {
   prevInput.className = "prevInput";
   prevInput.innerText = prevOperand.toString();
   if (prevInput.innerText.length > 16) {
-    prevInput.innerText = prevInput.innerText.substring(0, 18);
+    prevInput.innerText = prevInput.innerText.substring(0, 16);
   }
 
   const currInput: HTMLElement = document.createElement("p");

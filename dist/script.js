@@ -289,7 +289,7 @@ function loadDisplay() {
     prevInput.className = "prevInput";
     prevInput.innerText = prevOperand.toString();
     if (prevInput.innerText.length > 16) {
-        prevInput.innerText = prevInput.innerText.substring(0, 18);
+        prevInput.innerText = prevInput.innerText.substring(0, 16);
     }
     const currInput = document.createElement("p");
     screen === null || screen === void 0 ? void 0 : screen.appendChild(currInput);
