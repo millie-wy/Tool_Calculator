@@ -56,7 +56,13 @@ function handleKeyDown(event) {
             }
         }
         else if (event.key === digits[i]) {
-            addNumToCurrOperand(event.key);
+            if (event.key === "." && currOperand.includes(".")) {
+                // avoid input of multiple decimal separators
+                void 0;
+            }
+            else {
+                addNumToCurrOperand(event.key);
+            }
         }
     }
     const operators = ["+", "-", "*", "/"];
@@ -153,7 +159,13 @@ function handleBtnClick(event) {
         }
     }
     else if (checkIfInputIsNum(userInput)) {
-        addNumToCurrOperand(userInput);
+        if (userInput === "." && currOperand.includes(".")) {
+            // avoid input of multiple decimal separators
+            void 0;
+        }
+        else {
+            addNumToCurrOperand(userInput);
+        }
     }
     const operators = ["+", "-", "×", "÷"];
     for (let x = 0; x < operators.length; x++) {
@@ -315,7 +327,12 @@ function performCalculation() {
     else {
         return false;
     }
+    // processAnswer(computation);
     printAnswer(computation);
+}
+function processAnswer(computation) {
+    // to be done
+    console.log(computation);
 }
 function printAnswer(computation) {
     currOperand = [];

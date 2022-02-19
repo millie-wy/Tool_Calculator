@@ -61,7 +61,12 @@ function handleKeyDown(event: KeyboardEvent) {
         addNumToCurrOperand(event.key);
       }
     } else if (event.key === digits[i]) {
-      addNumToCurrOperand(event.key);
+      if (event.key === "." && currOperand.includes(".")) {
+        // avoid input of multiple decimal separators
+        void 0;
+      } else {
+        addNumToCurrOperand(event.key);
+      }
     }
   }
 
@@ -162,7 +167,12 @@ function handleBtnClick(event: Event) {
       addNumToCurrOperand(userInput);
     }
   } else if (checkIfInputIsNum(userInput)) {
-    addNumToCurrOperand(userInput);
+    if (userInput === "." && currOperand.includes(".")) {
+      // avoid input of multiple decimal separators
+      void 0;
+    } else {
+      addNumToCurrOperand(userInput);
+    }
   }
 
   const operators: string[] = ["+", "-", "×", "÷"];
@@ -338,7 +348,13 @@ function performCalculation() {
   } else {
     return false;
   }
+  // processAnswer(computation);
   printAnswer(computation);
+}
+
+function processAnswer(computation: string) {
+  // to be done
+  console.log(computation);
 }
 
 function printAnswer(computation: number) {
