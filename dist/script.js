@@ -33,15 +33,27 @@ function handleKeyDown(event) {
         ".",
     ];
     for (let i = 0; i < digits.length; i++) {
-        if ((currOperand[0] === "0" && event.key === "0") || // avoid multiple 0 input if the first digit input is 0
-            (currOperand[0] === "0" && event.key !== digits[i]) // avoid 0 being erased when other key is pressed
+        if ((currOperand.length === 1 &&
+            currOperand[0] === "0" &&
+            event.key === "0") || // avoid multiple 0 input if the first digit input is 0
+            (currOperand.length === 1 &&
+                currOperand[0] === "0" &&
+                event.key !== digits[i]) // avoid 0 being erased when other key is pressed
         ) {
             resetCurrOperand();
         }
-        else if (currOperand[0] === "0" && event.key !== "0") {
-            // remove the 0 if the first digit input is 0
-            currOperand.shift();
-            addNumToCurrOperand(event.key);
+        else if (currOperand.length === 1 &&
+            currOperand[0] === "0" &&
+            event.key === digits[i]) {
+            if (event.key === ".") {
+                // not removing the initial 0
+                addNumToCurrOperand(event.key);
+            }
+            else {
+                // remove the initial 0
+                currOperand.shift();
+                addNumToCurrOperand(event.key);
+            }
         }
         else if (event.key === digits[i]) {
             addNumToCurrOperand(event.key);
@@ -78,8 +90,8 @@ function handleKeyDown(event) {
     }
     else if (event.keyCode === 27) {
         // escape
-        resetCurrOperand;
-        resetPrevOperand;
+        resetCurrOperand();
+        resetPrevOperand();
     }
     else if ((event.keyCode === 13 && prevOperand.length !== 0) ||
         (event.key === "=" && prevOperand.length !== 0)) {
@@ -104,35 +116,89 @@ function checkIfInputIsNum(input) {
         "8",
         "9",
         "0",
+        "00",
         ".",
     ];
     for (let i = 0; i < numberKeys.length; i++) {
         if (input === numberKeys[i]) {
             return true;
         }
-        return false;
     }
+    return false;
 }
 function handleBtnClick(event) {
     clearDisplay();
     const eventTarget = event.target;
     eventTarget.blur(); // remove focus after click
     const userInput = eventTarget.innerText;
-    if (Number(currOperand[0]) === 0 && checkIfInputIsNum(userInput)) {
-        currOperand.shift();
-        addNumToCurrOperand(userInput);
+    if (
+    // avoid input of "00" when currOperand is 0
+    currOperand[0] === "0" &&
+        userInput === "00") {
+        resetCurrOperand();
+    }
+    else if (
+    // normal input (currOperand is 0 and a digit is input)
+    currOperand.length === 1 &&
+        currOperand[0] === "0" &&
+        checkIfInputIsNum(userInput)) {
+        if (userInput === ".") {
+            // not removing the initial 0
+            addNumToCurrOperand(userInput);
+        }
+        else {
+            // remove the initial 0
+            currOperand.shift();
+            addNumToCurrOperand(userInput);
+        }
     }
     else if (checkIfInputIsNum(userInput)) {
         addNumToCurrOperand(userInput);
     }
-    const symbolKeys = ["+", "-", "×", "÷", "="];
-    for (let x = 0; x < symbolKeys.length; x++) {
-        if (currOperand.length !== 0 && userInput === symbolKeys[x]) {
-            // avoid symbol input before a digit is enter
+    const operators = ["+", "-", "×", "÷"];
+    for (let x = 0; x < operators.length; x++) {
+        if (
+        // allow changing of operator of prevOpperand when curr is 0
+        prevOperand.length !== 0 &&
+            currOperand.length === 1 &&
+            currOperand[0] === "0" &&
+            userInput === operators[x]) {
+            let newPrev = [];
+            newPrev[0] = prevOperand[0].slice(0, -1);
+            newPrev.push(userInput);
+            resetPrevOperand();
+            prevOperand.push(newPrev.join("").toString());
+        }
+        else if (prevOperand.length !== 0 && userInput === operators[x]) {
+            // perform calculation if prevOperand is not empty
+            performCalculation();
+        }
+        else if (
+        // avoid symbol input when the currOperand is 0
+        currOperand.length === 1 &&
+            currOperand[0] === "0" &&
+            userInput === operators[x]) {
+            resetCurrOperand();
+            console.log("reset!");
+        }
+        else if (currOperand.length !== 0 && userInput === operators[x]) {
+            // allow input when currOperand is not empty
             currOperand.push(userInput);
             prevOperand.push(currOperand.join("").toString());
             resetCurrOperand();
         }
+    }
+    if (userInput === "%") {
+        let num = Number(currOperand.join(""));
+        currOperand = [];
+        currOperand[0] = performPercentageCalculation(num).toString();
+    }
+    else if (userInput === "C") {
+        resetCurrOperand();
+        resetPrevOperand();
+    }
+    else if (userInput === "=" && prevOperand.length !== 0) {
+        performCalculation();
     }
     loadDisplay();
 }
