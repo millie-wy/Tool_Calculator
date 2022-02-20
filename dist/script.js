@@ -327,16 +327,16 @@ function performCalculation() {
     else {
         return false;
     }
-    // processAnswer(computation);
-    printAnswer(computation);
+    processAnswer(computation);
 }
 function processAnswer(computation) {
-    // to be done
-    console.log(computation);
+    const shortenedAns = computation.toFixed(14);
+    const processedAns = parseFloat(shortenedAns).toString();
+    printAnswer(processedAns);
 }
-function printAnswer(computation) {
+function printAnswer(ans) {
     currOperand = [];
     resetPrevOperand();
-    addNumToCurrOperand(computation.toString());
+    addNumToCurrOperand(ans);
 }
 //# sourceMappingURL=script.js.map
