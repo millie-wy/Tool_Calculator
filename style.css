@@ -6,6 +6,7 @@ body {
   color: #f3ecdd;
   display: flex;
   justify-content: center;
+  background-color: whitesmoke;
 }
 
 header {
@@ -44,6 +45,7 @@ main {
   max-width: 450px;
   min-width: 380px;
   position: relative;
+  margin-bottom: 1rem;
 }
 
 .screen {
