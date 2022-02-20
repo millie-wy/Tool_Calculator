@@ -348,17 +348,17 @@ function performCalculation() {
   } else {
     return false;
   }
-  // processAnswer(computation);
-  printAnswer(computation);
+  processAnswer(computation);
 }
 
-function processAnswer(computation: string) {
-  // to be done
-  console.log(computation);
+function processAnswer(computation: number) {
+  const shortenedAns: string = computation.toFixed(14);
+  const processedAns: string = parseFloat(shortenedAns).toString();
+  printAnswer(processedAns);
 }
 
-function printAnswer(computation: number) {
+function printAnswer(ans: string) {
   currOperand = [];
   resetPrevOperand();
-  addNumToCurrOperand(computation.toString());
+  addNumToCurrOperand(ans);
 }
