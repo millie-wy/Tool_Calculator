@@ -218,11 +218,11 @@ function loadHeader() {
     const header = document.createElement("header");
     document.body.appendChild(header);
     const h1 = document.createElement("h1");
-    h1.textContent = "Hello World Calculator";
+    h1.textContent = "Hello World _ Calculator";
     header.appendChild(h1);
     const p = document.createElement("p");
-    p.textContent =
-        "In this page all you see is a calculator I created for myself :D";
+    p.innerHTML =
+        "'People may judge you for using a calculator for simple multiplication, but I'll never do that.' &nbsp;&nbsp; - 🧮";
     header.appendChild(p);
 }
 function loadMain() {
